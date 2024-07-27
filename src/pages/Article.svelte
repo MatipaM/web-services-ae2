@@ -1,107 +1,42 @@
 <script>
-    import { onMount } from "svelte";
-    import {getArticle,saveArticle,unsaveArticle,isArticleSaved,} from "../database.js"; 
-    import { user } from "../stores/auth.js";
+    import { onMount } from 'svelte';
+    import { getArticle } from '../database.js';
 
-    export let url;
+    export let url = '';
 
     let article = null;
-    let isLoading = true;
-    let isSaved = false;
+    let error = null;
 
     onMount(async () => {
         try {
             article = await getArticle(decodeURIComponent(url));
-            isLoading = false;
-            if ($user) {
-                isSaved = await isArticleSaved(
-                    $user.email,
-                    decodeURIComponent(url),
-                );
-            }
-        } catch (error) {
-            console.error("Error loading article:", error);
-            isLoading = false;
+        } catch (e) {
+            error = e.message;
         }
     });
-
-    async function toggleSave() {
-        if (!$user) {
-            alert("Please log in to save articles");
-            return;
-        }
-        try {
-            if (isSaved) {
-                await unsaveArticle($user.email, decodeURIComponent(url));
-            } else {
-                await saveArticle(
-                    $user.email,
-                    article.article_name,
-                    decodeURIComponent(url),
-                );
-            }
-            isSaved = !isSaved;
-        } catch (error) {
-            console.error("Error toggling save:", error);
-        }
-    }
 </script>
 
-<svelte:head>
-    <title>{article ? article.article_name : "Loading Article..."}</title>
-</svelte:head>
-
-<div class="article-page">
-    {#if isLoading}
-        <p>Loading article...</p>
-    {:else if article}
-        <h1>{article.article_name}</h1>
-
-        <button on:click={toggleSave}>
-            {isSaved ? "Unsave Article" : "Save Article"}
-        </button>
-
-        <div class="content">
-            <p>
-                URL: <a
-                    href={article.url}
-                    target="_blank"
-                    rel="noopener noreferrer">{article.url}</a
-                >
-            </p>
-        </div>
-    {:else}
-        <p>Article not found.</p>
-    {/if}
-</div>
+{#if error}
+    <p>Error: {error}</p>
+{:else if article}
+    <h1>{article.article_name}</h1>
+    <p>URL: <a href={article.url} target="_blank" rel="noopener noreferrer">{article.url}</a></p>
+{:else}
+    <p>No article</p>
+{/if}
 
 <style>
-    .article-page {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
     h1 {
-        font-size: 2em;
-        margin-bottom: 10px;
+        color: #333;
     }
-
-    .content {
-        margin-top: 20px;
-        line-height: 1.6;
+    p {
+        margin-bottom: 1em;
     }
-
-    button {
-        margin-top: 10px;
-        padding: 5px 10px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        cursor: pointer;
+    a {
+        color: #0066cc;
+        text-decoration: none;
     }
-
-    button:hover {
-        background-color: #45a049;
+    a:hover {
+        text-decoration: underline;
     }
 </style>
