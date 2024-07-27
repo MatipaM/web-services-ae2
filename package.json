@@ -38,8 +38,10 @@
     "postcss": "^8.4.39",
     "rollup": "^4.19.0",
     "source-map-js": "^1.2.0",
+    "sql.js": "^1.10.3",
     "sqlite3": "^5.1.7",
     "svelte-hmr": "^0.16.0",
+    "svelte-routing": "^2.13.0",
     "vitefu": "^0.2.5"
   },
   "keywords": [],
