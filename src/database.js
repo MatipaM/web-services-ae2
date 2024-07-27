@@ -1,15 +1,6 @@
-import initSqlJs from 'sql.js';
+import Database from 'better-sqlite3';
 
-let db;
-let SQL;
-
-async function initDb() {
-  SQL = await initSqlJs({
-    locateFile: file => `https://sql.js.org/dist/${file}`
-  });
-  db = new SQL.Database();
-  createTables();
-}
+const db = new Database('./database-reader.db', { verbose: console.log });
 
 function createTables() {
   const createUser = `
@@ -32,51 +23,70 @@ function createTables() {
     );
   `;
 
-  db.run(createUser);
-  db.run(createSavedArticles);
+  db.exec(createUser);
+  db.exec(createSavedArticles);
   console.log('Tables created successfully.');
 }
 
-export async function getArticle(url) {
-  await ensureDbInitialized();
-  const stmt = db.prepare('SELECT * FROM savedArticles WHERE url = :url');
-  const result = stmt.getAsObject({':url': url});
-  stmt.free();
-  if (Object.keys(result).length === 0) {
+function insertSampleArticles() {
+  const sampleArticles = [
+    {
+      article_name: "The Future of AI",
+      url: "https://example.com/ai-future",
+      email: "sample@email.com"
+    },
+    {
+      article_name: "Web Development Trends 2024",
+      url: "https://example.com/web-dev-2024",
+      email: "sample@email.com"
+    },
+    {
+      article_name: "Introduction to Svelte",
+      url: "https://example.com/svelte-intro",
+      email: "sample@email.com"
+    }
+  ];
+
+  const insert = db.prepare('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)');
+  const insertMany = db.transaction((articles) => {
+    for (const article of articles) insert.run(article.article_name, article.url, article.email);
+  });
+
+  insertMany(sampleArticles);
+  console.log('Sample articles inserted successfully.');
+}
+
+createTables();
+insertSampleArticles();
+
+export function getArticle(url) {
+  const stmt = db.prepare('SELECT * FROM savedArticles WHERE url = ?');
+  const result = stmt.get(url);
+  if (!result) {
     throw new Error('Article not found');
   }
   return result;
 }
 
-export async function saveArticle(email, articleName, url) {
-  await ensureDbInitialized();
-  const stmt = db.prepare('INSERT INTO savedArticles (email, article_name, url) VALUES (:email, :article_name, :url)');
-  stmt.run({':email': email, ':article_name': articleName, ':url': url});
-  stmt.free();
+export function getAllArticles() {
+  const stmt = db.prepare('SELECT * FROM savedArticles');
+  return stmt.all();
 }
 
-export async function unsaveArticle(email, url) {
-  await ensureDbInitialized();
-  const stmt = db.prepare('DELETE FROM savedArticles WHERE email = :email AND url = :url');
-  stmt.run({':email': email, ':url': url});
-  stmt.free();
+export function saveArticle(email, articleName, url) {
+  const stmt = db.prepare('INSERT OR REPLACE INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)');
+  stmt.run(email, articleName, url);
 }
 
-export async function isArticleSaved(email, url) {
-  await ensureDbInitialized();
-  const stmt = db.prepare('SELECT * FROM savedArticles WHERE email = :email AND url = :url');
-  const result = stmt.get({':email': email, ':url': url});
-  stmt.free();
+export function unsaveArticle(email, url) {
+  const stmt = db.prepare('DELETE FROM savedArticles WHERE email = ? AND url = ?');
+  stmt.run(email, url);
+}
+
+export function isArticleSaved(email, url) {
+  const stmt = db.prepare('SELECT * FROM savedArticles WHERE email = ? AND url = ?');
+  const result = stmt.get(email, url);
   return !!result;
 }
-
-async function ensureDbInitialized() {
-  if (!db) {
-    await initDb();
-  }
-}
-
-// Initialize the database
-initDb().catch(console.error);
 
 export { db };
