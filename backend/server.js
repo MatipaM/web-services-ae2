@@ -25,7 +25,7 @@ db.serialize(() => {
           console.error(err.message);
         }
         console.log(row);
-      });
+    });
 
     db.run(`CREATE TABLE IF NOT EXISTS users (
     firstname TEXT NOT NULL,
@@ -45,59 +45,14 @@ db.serialize(() => {
 
     console.log('Tables created successfully.');
 
-    // Check if the users table is empty, and insert initial data if it is
-    db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
+    // Insert the BBC article
+    const bbcArticle = ['BBC Olympics Article', 'https://www.bbc.co.uk/sport/olympics/articles/cw4yepmknkpo', 'john.doe@example.com'];
+
+    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle, (err) => {
         if (err) {
-            console.error('Error counting users', err);
-            return;
-        }
-
-        if (row.count === 0) {
-            const usersData = [
-                ['John', 'Doe', '1980-01-01', 'john.doe@example.com', '123 Elm Street'],
-                ['Jane', 'Smith', '1990-02-02', 'jane.smith@example.com', '456 Oak Avenue'],
-                ['Alice', 'Johnson', '1985-03-03', 'alice.johnson@example.com', '789 Pine Road'],
-            ];
-
-            const insertUserStmt = db.prepare('INSERT INTO users (firstname, lastname, dob, email, address) VALUES (?, ?, ?, ?, ?)');
-            usersData.forEach(user => {
-                insertUserStmt.run(user, err => {
-                    if (err) {
-                        console.error('Error inserting user', err);
-                    }
-                });
-            });
-            insertUserStmt.finalize();
-
-            console.log('Sample users data inserted.');
-        }
-    });
-
-    // Check if the savedArticles table is empty, and insert initial data if it is
-    db.get('SELECT COUNT(*) AS count FROM savedArticles', (err, row) => {
-        if (err) {
-            console.error('Error counting savedArticles', err);
-            return;
-        }
-
-        if (row.count === 0) {
-            const articlesData = [
-                ['First Article', 'http://example.com/first', 'john.doe@example.com'],
-                ['Second Article', 'http://example.com/second', 'jane.smith@example.com'],
-                ['Third Article', 'http://example.com/third', 'alice.johnson@example.com'],
-            ];
-
-            const insertArticleStmt = db.prepare('INSERT INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)');
-            articlesData.forEach(article => {
-                insertArticleStmt.run(article, err => {
-                    if (err) {
-                        console.error('Error inserting article', err);
-                    }
-                });
-            });
-            insertArticleStmt.finalize();
-
-            console.log('Sample articles data inserted.');
+            console.error('Error inserting BBC article', err);
+        } else {
+            console.log('BBC article inserted successfully.');
         }
     });
 });
@@ -127,7 +82,6 @@ app.get('/article/:url', (req, res) => {
         }
     });
 });
-
 
 app.post('/article', (req, res) => {
     const { email, article_name, url } = req.body;
