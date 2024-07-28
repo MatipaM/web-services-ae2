@@ -36,6 +36,16 @@ const createTables = () => {
     );
   `;
 
+  // Keeps list of feeds user has subscribed to 
+  const createSubscribedFeeds = ` 
+    CREATE TABLE IF NOT EXISTS subscribedFeeds (
+      feed_link TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL,
+      FOREIGN KEY (email) REFERENCES users(email),
+      PRIMARY KEY (feed_link)
+    );
+  `;
+
   // Ensure sequential execution of SQL commands
   db.serialize(() => {
     // Create users table
@@ -52,17 +62,26 @@ const createTables = () => {
           } else {
             console.log('Table "savedArticles" created successfully.');
 
-            // Close the database connection after all operations are complete
-            db.close((err) => {
+            // Create subscribedFeeds table
+            db.run(createSubscribedFeeds, (err) => {
               if (err) {
-                console.error('Error closing the database:', err.message);
+                console.error('Error creating "subscribedFeeds" table:', err.message);
               } else {
-                console.log('Database connection closed.');
+                console.log('Table "subscribedFeeds" created successfully.');
+
+                // Close the database connection after all operations are complete
+                db.close((err) => {
+                  if (err) {
+                    console.error('Error closing the database:', err.message);
+                  } else {
+                    console.log('Database connection closed.');
+                  }
+                });
               }
-            });
+            }); // end of createSubscribedFeeds
           }
-        });
+        }); // end of createSavedArticles
       }
-    });
+    }); // end of createUser
   });
 };
