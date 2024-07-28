@@ -83,6 +83,31 @@ app.get('/article/:url', (req, res) => {
     });
 });
 
+app.get('/article/saved', (req, res) => {
+    const { email, url } = req.query;
+    db.get('SELECT * FROM savedArticles WHERE email = ? AND url = ?', [email, url], (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ isSaved: !!row });
+    });
+  });
+
+app.get('/user/:email', (req, res) => {
+db.get('SELECT * FROM users WHERE email = ?', [req.params.email], (err, row) => {
+    if (err) {
+    res.status(500).json({ error: err.message });
+    return;
+    }
+    if (row) {
+    res.json(row);
+    } else {
+    res.status(404).json({ error: 'User not found' });
+    }
+});
+});
+
 app.post('/article', (req, res) => {
     const { email, article_name, url } = req.body;
     db.run('INSERT OR REPLACE INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)',

@@ -1,7 +1,8 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 export const isAuthenticated = writable(false);
 export const user = writable(null);
+export const userEmail = derived(user, $user => $user ? $user.email : null);
 
 export function login(email) {
   isAuthenticated.set(true);

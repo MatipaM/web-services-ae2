@@ -45,10 +45,9 @@ export async function unsaveArticle(email, url) {
 }
 
 export async function isArticleSaved(email, url) {
-  try {
-    await getArticle(url);
-    return true;
-  } catch {
-    return false;
+  const response = await fetch(`${API_URL}/article/saved?email=${encodeURIComponent(email)}&url=${encodeURIComponent(url)}`);
+  if (!response.ok) {
+    throw new Error('Failed to check article status');
   }
+  return response.json();
 }
