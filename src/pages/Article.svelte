@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { getArticle, saveArticle, isArticleSaved } from "../database.js";
+    import { getArticle, saveArticle, isArticleSaved } from "../api.js";
     import { userEmail } from "../stores/auth.js";
 
     export let url = "";

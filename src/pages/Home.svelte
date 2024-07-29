@@ -1,7 +1,7 @@
 <script>
     import { Link } from "svelte-routing";
     import { onMount } from 'svelte';
-    import { getAllArticles } from '../database.js';
+    import { getAllArticles } from '../api.js';
     import './Home.css';
 
     let articles = [];
