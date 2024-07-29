@@ -1,6 +1,6 @@
 Run these two commands for backend:
 
-cd server
+cd backend
 
 node server.js
 

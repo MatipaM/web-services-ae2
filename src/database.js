@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 const API_URL = 'http://localhost:3000';
 import sqlite3 from 'sqlite3';
+=======
+const API_URL = '/api';
+>>>>>>> b471c75 ('updates')
 
 export async function getArticle(url) {
   const response = await fetch(`${API_URL}/article/${encodeURIComponent(url)}`);
