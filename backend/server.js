@@ -46,9 +46,18 @@ db.serialize(() => {
     console.log('Tables created successfully.');
 
     // Insert the BBC article
-    const bbcArticle = ['BBC Olympics Article', 'https://www.bbc.co.uk/sport/olympics/articles/cw4yepmknkpo', 'john.doe@example.com'];
+    const bbcArticle = ['BBC Olympics Article', 'https://www.bbc.co.uk/sport/olympics/articles/cw4yepmknkpo', 'john@gmail.com'];
+    const bbcArticle2 = ['BBC Politics Article', 'https://www.bbc.co.uk/news/articles/cmj260e54x7o', 'john@gmail.com'];
 
-    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle, (err) => {
+    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle,  (err) => {
+        if (err) {
+            console.error('Error inserting BBC article', err);
+        } else {
+            console.log('BBC article inserted successfully.');
+        }
+    });
+
+    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle2,  (err) => {
         if (err) {
             console.error('Error inserting BBC article', err);
         } else {
@@ -56,6 +65,8 @@ db.serialize(() => {
         }
     });
 });
+
+    
 
 // API endpoints
 app.get('/articles', (req, res) => {

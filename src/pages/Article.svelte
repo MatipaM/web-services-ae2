@@ -4,7 +4,6 @@
     import { userEmail } from "../stores/auth.js";
 
     export let url = "";
-
     let article = null;
     let error = null;
     let loading = true;
@@ -25,11 +24,7 @@
         try {
             article = await getArticle(decodeURIComponent(url));
             if (currentUserEmail) {
-                const result = await isArticleSaved(
-                    currentUserEmail,
-                    article.url,
-                );
-                isSaved = result.isSaved;
+                await checkIfSaved();
             }
         } catch (e) {
             error = e.message;
