@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { getAllArticles } from '../database.js';
+    import { getAllArticles } from '../api.js';
     
     let articles = [];
     let error = null;
