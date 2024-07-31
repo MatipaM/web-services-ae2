@@ -8,17 +8,6 @@ export async function getArticle(url) {
   return response.json();
 }
 
-export async function getFeed(url) {
-  const response = await fetch(`${API_URL}/feed/${encodeURIComponent(url)}`);
-  console.log("encodeURI", (url))
-  console.log("response",response)
-  if (!response.ok) {
-    throw new Error('Feed not found');
-  }
-
-  return response.json();
-}
-
 export async function getFeeds(){
   const response = await fetch(`${API_URL}/feeds`);
   if (!response.ok) {

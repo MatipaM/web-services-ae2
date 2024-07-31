@@ -1,63 +1,66 @@
 <script>
     import { onMount } from "svelte";
-    import { getFeed, saveFeed, isArticleSaved } from "../api.js";
-    import { userEmail } from "../stores/auth.js"; 
+    import { getArticle, saveArticle, isArticleSaved } from "../api.js";
+    import { userEmail } from "../stores/auth.js";
 
     export let url = "";
 
-    let feed = null;
+    let feeds = null;
     let error = null;
     let loading = true;
     let isSaved = false;
 
-    $: currentUserEmail = $userEmail;
-
     onMount(async () => {
-         console.log("is running")
         try {
-            feed = await getFeed(decodeURIComponent(url));
-            console.log("feed",feed)
+            feeds = await getArticle(decodeURIComponent(url));
+  
+                const result = await isArticleSaved(
+                    feeds.name,
+                    feeds.url,
+                );
+            
         } catch (e) {
-            console.log(e)
+            error = e.message;
         } finally {
             loading = false;
         }
     });
 
-    async function handleSubscribe() {
-        if (!currentUserEmail) {
-            alert("Please log in to subscribe to feeds");
-            return;
-        }
-        try {
-            await saveFeed({
-                feed_name: feed.feed_name,
-                url: feed.url,
-            });
-            isSaved = true;
-            alert("Article saved successfully!");
-        } catch (e) {
-            alert("Error saving article: " + e.message);
-        }
+        // NEED TO WOKR ON THIS
+    async function handleSubscribed() {
+    //     if (!currentUserEmail) {
+    //         alert("Please log in to save articles");
+    //         return;
+    //     }
+    //     try {
+    //         await saveArticle({
+    //             email: currentUserEmail,
+    //             article_name: article.article_name,
+    //             url: article.url,
+    //         });
+    //         isSaved = true;
+    //         alert("Article saved successfully!");
+    //     } catch (e) {
+    //         alert("Error saving article: " + e.message);
+    //     }
     }
 </script>
 
 {#if loading}
-    <p>Loading feed...</p>
+    <p>Loading article...</p>
 {:else if error}
     <p>Error: {error}</p>
-{:else if feed}
-    <h1>{feed.feed_name}</h1>
+{:else if feeds}
+    <h1>{feeds.name}</h1>
     <p>
-        URL: <a href={feed.url} target="_blank" rel="noopener noreferrer"
-            >{feed.url}</a
+        URL: <a href={feeds.url} target="_blank" rel="noopener noreferrer"
+            >{feeds.url}</a
         >
     </p>
 
-    <button on:click={handleSubscribe}>
-        {isSaved ? "Unsubscribe to feed" : "Subscribe to feed"}
+    <button on:click={handleSubscribed}>
+        {isSaved ? "Unsubscribed to feed" : "Subscribed to feed"}
     </button>
-
 {:else}
-    <p>No feed found</p>
+    <p>No Feeds found</p>
 {/if}

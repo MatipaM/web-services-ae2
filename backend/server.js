@@ -63,14 +63,6 @@ db.serialize(() => {
         }
     });
 
-    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle2,  (err) => {
-        if (err) {
-            console.error('Error inserting BBC article', err);
-        } else {
-            console.log('BBC article inserted successfully.');
-        }
-    });
-
       // General Feeds, which will be shown on home page
       const bbc = ['BBC', 'https://www.bbc.co.uk/'];
       const cnn = ['CNN', 'https://edition.cnn.com/'];
@@ -89,8 +81,6 @@ db.serialize(() => {
       }
   
 });
-
-    
 
 // API endpoints
 app.get('/feeds', (req,res) => {
