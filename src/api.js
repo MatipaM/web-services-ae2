@@ -8,6 +8,14 @@ export async function getArticle(url) {
   return response.json();
 }
 
+export async function getFeeds(){
+  const response = await fetch(`${API_URL}/feeds`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch feeds');
+  }
+  return response.json();
+}
+
 export async function getAllArticles() {
   const response = await fetch(`${API_URL}/articles`);
   if (!response.ok) {
