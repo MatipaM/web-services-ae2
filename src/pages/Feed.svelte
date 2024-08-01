@@ -26,7 +26,7 @@
          console.log("is running")
         try {
             feed = await getFeed(decodeURIComponent(url));
-            console.log(feed)
+            console.log("feed",feed)
         } catch (e) {
             error = e.message;
         } finally {
