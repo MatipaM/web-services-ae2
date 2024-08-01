@@ -22,7 +22,7 @@
   <main>
     <Route path="/" component={Home} />
     <Route path="/login" component={Login} />
-    <Route path="/feed" component={Feeds} />
+    <Route path="/feeds" component={Feeds} />
     <Route path="/article/:url" component={Article} />
     <Route path="/feed/:url" component={Feed} />
     <Route path="/saved" component={SavedArticles} />

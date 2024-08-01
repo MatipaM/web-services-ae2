@@ -10,9 +10,12 @@ export async function getArticle(url) {
 
 export async function getFeed(url) {
   const response = await fetch(`${API_URL}/feed/${encodeURIComponent(url)}`);
+  console.log("response",response)
+
   if (!response.ok) {
     throw new Error('Feed not found');
   }
+
   return response.json();
 }
 
