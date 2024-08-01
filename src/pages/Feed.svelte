@@ -24,22 +24,22 @@
         }
     });
 
-    // async function handleSave() {
-    //     if (!currentUserEmail) {
-    //         alert("Please log in to subscribe to feeds");
-    //         return;
-    //     }
-    //     try {
-    //         await saveFeed({
-    //             feed_name: feed.feed_name,
-    //             url: feed.url,
-    //         });
-    //         isSaved = true;
-    //         alert("Article saved successfully!");
-    //     } catch (e) {
-    //         alert("Error saving article: " + e.message);
-    //     }
-    // }
+    async function handleSubscribe() {
+        if (!currentUserEmail) {
+            alert("Please log in to subscribe to feeds");
+            return;
+        }
+        try {
+            await saveFeed({
+                feed_name: feed.feed_name,
+                url: feed.url,
+            });
+            isSaved = true;
+            alert("Article saved successfully!");
+        } catch (e) {
+            alert("Error saving article: " + e.message);
+        }
+    }
 </script>
 
 {#if loading}
@@ -53,20 +53,11 @@
             >{feed.url}</a
         >
     </p>
-    <!-- {#if feed.author}
-        <p>Author: {article.author}</p>
-    {/if} -->
-    <!-- {#if article.published_date}
-        <p>
-            Published: {new Date(article.published_date).toLocaleDateString()}
-        </p>
-    {/if} -->
-    <!-- <button on:click={handleSave}>
-        {isSaved ? "Unsave Article" : "Save Article"}
-    </button> -->
-    <!-- <div class="article-content">
-        {@html article.content}
-    </div> -->
+
+    <button on:click={handleSubscribe}>
+        {isSaved ? "Unsubscribe to feed" : "Subscribe to feed"}
+    </button>
+
 {:else}
     <p>No feed found</p>
 {/if}
