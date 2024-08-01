@@ -11,7 +11,6 @@
     onMount(async () => {
         try {
             feeds = await getFeeds();
-            console.log(feeds)
             // articles = await getAllArticles(); 
         } catch (err) {
             error = err.message;
@@ -28,8 +27,8 @@
         <div class="article-container">
             {#each feeds as feed}
                 <div class="article-box">
-                    <!-- <Link class="article-link" to={`/feeds/${encodeURIComponent(feed.url)}`}>  to={`/feeds/${encodeURIComponent(feed.url)}`} -->
-                    <Link class="article-link" to={feed.url}> 
+                    <Link class="article-link" to={`/feed/${encodeURIComponent(feed.url)}`}>
+                    <!-- <Link class="article-link" to={feed.url}>  -->
                         {feed.feed_name}
                     </Link>
                 </div>
