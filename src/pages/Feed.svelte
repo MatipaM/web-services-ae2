@@ -1,9 +1,8 @@
 <script>
     import { onMount } from "svelte";
-    import { getFeed, saveArticle, isArticleSaved } from "../api.js";
-    import { userEmail } from "../stores/auth.js";
+    import { getFeed, saveFeed, isArticleSaved } from "../api.js";
+    import { userEmail } from "../stores/auth.js"; 
 
-    console.log("feed page is called")
     export let url = "";
 
     let feed = null;
@@ -11,16 +10,7 @@
     let loading = true;
     let isSaved = false;
 
-    // $: currentUserEmail = $userEmail;
-
-    // async function checkIfSaved() {
-    //     try {
-    //         const result = await isArticleSaved(currentUserEmail, feed.url);
-    //         isSaved = result.isSaved;
-    //     } catch (e) {
-    //         console.error("Error checking if article is saved:", e);
-    //     }
-    // }
+    $: currentUserEmail = $userEmail;
 
     onMount(async () => {
          console.log("is running")
@@ -28,7 +18,7 @@
             feed = await getFeed(decodeURIComponent(url));
             console.log("feed",feed)
         } catch (e) {
-            error = e.message;
+            console.log(e)
         } finally {
             loading = false;
         }
@@ -36,14 +26,13 @@
 
     // async function handleSave() {
     //     if (!currentUserEmail) {
-    //         alert("Please log in to save articles");
+    //         alert("Please log in to subscribe to feeds");
     //         return;
     //     }
     //     try {
-    //         await saveArticle({
-    //             email: currentUserEmail,
-    //             article_name: article.article_name,
-    //             url: article.url,
+    //         await saveFeed({
+    //             feed_name: feed.feed_name,
+    //             url: feed.url,
     //         });
     //         isSaved = true;
     //         alert("Article saved successfully!");
@@ -54,7 +43,7 @@
 </script>
 
 {#if loading}
-    <p>Loading article...</p>
+    <p>Loading feed...</p>
 {:else if error}
     <p>Error: {error}</p>
 {:else if feed}
