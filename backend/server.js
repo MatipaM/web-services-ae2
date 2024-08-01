@@ -113,6 +113,21 @@ app.get('/articles', (req, res) => {
     });
 });
 
+app.get('/feed/:url', (req, res) => {
+    const decodedUrl = decodeURIComponent(req.params.url);
+    db.get('SELECT * FROM feeds WHERE url = ?', [decodedUrl], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'Feed not found' });
+        }
+    });
+});
+
 app.get('/article/:url', (req, res) => {
     const decodedUrl = decodeURIComponent(req.params.url);
     db.get('SELECT * FROM savedArticles WHERE url = ?', [decodedUrl], (err, row) => {

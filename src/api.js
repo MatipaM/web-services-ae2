@@ -10,8 +10,8 @@ export async function getArticle(url) {
 
 export async function getFeed(url) {
   const response = await fetch(`${API_URL}/feed/${encodeURIComponent(url)}`);
+  console.log("encodeURI", (url))
   console.log("response",response)
-
   if (!response.ok) {
     throw new Error('Feed not found');
   }
@@ -42,6 +42,20 @@ export async function saveArticle(email, articleName, url) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, article_name: articleName, url }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to save article');
+  }
+  return response.json();
+}
+
+export async function saveFeed(feed_name, url) {
+  const response = await fetch(`${API_URL}/article`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ feed_name: feed_name, url }),
   });
   if (!response.ok) {
     throw new Error('Failed to save article');
