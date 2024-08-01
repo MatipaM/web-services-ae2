@@ -2,7 +2,7 @@
   import { Router, Route, Link } from "svelte-routing";
   import Home from "./pages/Home.svelte";
   import Login from "./pages/Login.svelte";
-  import Feeds from "./pages/SubscribeFeeds.svelte";
+  import Feeds from "./pages/Feeds.svelte";
   import Feed from "./pages/Feed.svelte";
   import SubscribeFeeds from "./pages/SubscribeFeeds.svelte";
   import Article from "./pages/Article.svelte";
@@ -22,7 +22,7 @@
   <main>
     <Route path="/" component={Home} />
     <Route path="/login" component={Login} />
-    <Route path="/subscribedfeeds" component={SubscribeFeeds} />
+    <Route path="/feed" component={Feeds} />
     <Route path="/article/:url" component={Article} />
     <Route path="/feed/:url" component={Feed} />
     <Route path="/saved" component={SavedArticles} />
