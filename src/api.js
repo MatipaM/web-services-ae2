@@ -1,33 +1,12 @@
-import axios from 'axios';
-import cheerio from 'cheerio';
-
-export async function getArticle(url) {
-  try {
-    const response = await axios.get(url);
-    const html = response.data;
-    const $ = cheerio.load(html);
-
-    const article_name = $('h1').first().text().trim();
-    const author = $('.byline__name').first().text().trim();
-    const published_date = $('time').attr('datetime');
-    const content = $('.article__body-content').html();
-
-    return {
-      article_name,
-      url,
-      author,
-      published_date,
-      content
-    };
-  } catch (error) {
-    console.error('Error fetching article:', error);
-    throw new Error('Failed to fetch article');
-  }
-}
-
-
 const API_URL = '/api';
 
+export async function getArticle(url) {
+  const response = await fetch(`${API_URL}/article/${encodeURIComponent(url)}`);
+  if (!response.ok) {
+    throw new Error('Article not found');
+  }
+  return response.json();
+}
 
 export async function getAllArticles() {
   const response = await fetch(`${API_URL}/articles`);
