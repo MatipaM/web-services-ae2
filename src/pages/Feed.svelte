@@ -1,24 +1,32 @@
 <script>
     import { onMount } from "svelte";
-    import { getArticle, saveArticle, isArticleSaved } from "../api.js";
+    import { getFeed, saveArticle, isArticleSaved } from "../api.js";
     import { userEmail } from "../stores/auth.js";
 
+    console.log("feed page is called")
     export let url = "";
 
-    let feeds = null;
+    let feed = null;
     let error = null;
     let loading = true;
     let isSaved = false;
 
+    // $: currentUserEmail = $userEmail;
+
+    // async function checkIfSaved() {
+    //     try {
+    //         const result = await isArticleSaved(currentUserEmail, feed.url);
+    //         isSaved = result.isSaved;
+    //     } catch (e) {
+    //         console.error("Error checking if article is saved:", e);
+    //     }
+    // }
+
     onMount(async () => {
+         console.log("is running")
         try {
-            feeds = await getArticle(decodeURIComponent(url));
-  
-                const result = await isArticleSaved(
-                    feeds.name,
-                    feeds.url,
-                );
-            
+            feed = await getFeed(decodeURIComponent(url));
+            console.log(feed)
         } catch (e) {
             error = e.message;
         } finally {
@@ -26,8 +34,7 @@
         }
     });
 
-        // NEED TO WOKR ON THIS
-    async function handleSubscribed() {
+    // async function handleSave() {
     //     if (!currentUserEmail) {
     //         alert("Please log in to save articles");
     //         return;
@@ -43,24 +50,34 @@
     //     } catch (e) {
     //         alert("Error saving article: " + e.message);
     //     }
-    }
+    // }
 </script>
 
 {#if loading}
     <p>Loading article...</p>
 {:else if error}
     <p>Error: {error}</p>
-{:else if feeds}
-    <h1>{feeds.name}</h1>
+{:else if feed}
+    <h1>{feed.feed_name}</h1>
     <p>
-        URL: <a href={feeds.url} target="_blank" rel="noopener noreferrer"
-            >{feeds.url}</a
+        URL: <a href={feed.url} target="_blank" rel="noopener noreferrer"
+            >{feed.url}</a
         >
     </p>
-
-    <button on:click={handleSubscribed}>
-        {isSaved ? "Unsubscribed to feed" : "Subscribed to feed"}
-    </button>
+    <!-- {#if feed.author}
+        <p>Author: {article.author}</p>
+    {/if} -->
+    <!-- {#if article.published_date}
+        <p>
+            Published: {new Date(article.published_date).toLocaleDateString()}
+        </p>
+    {/if} -->
+    <!-- <button on:click={handleSave}>
+        {isSaved ? "Unsave Article" : "Save Article"}
+    </button> -->
+    <!-- <div class="article-content">
+        {@html article.content}
+    </div> -->
 {:else}
-    <p>No Feeds found</p>
+    <p>No feed found</p>
 {/if}
