@@ -92,6 +92,16 @@ app.get('/feeds', (req,res) => {
     });
 });
 
+app.get('/subscribedfeeds', (req,res) => {
+    db.all('SELECT * FROM feeds', (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
 app.get('/articles', (req, res) => {
     db.all('SELECT * FROM savedArticles', (err, rows) => {
         if (err) {

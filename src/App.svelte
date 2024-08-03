@@ -14,7 +14,7 @@
   <nav>
     <Link to="/">Home</Link>
     <Link to="/login">Login</Link>
-    <Link to="/feeds">Feeds</Link>
+    <Link to="/subscribedfeeds">Feeds</Link>
     <Link to="/saved">Saved Articles</Link>
   </nav>
 
