@@ -2,6 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -20,70 +21,83 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 db.serialize(() => {
 
-    db.each("SELECT * FROM savedArticles", (err, row) => {
-        if (err) {
-          console.error(err.message);
-        }
-        console.log(row);
-    });
-
     db.run(`CREATE TABLE IF NOT EXISTS users (
-    firstname TEXT NOT NULL,
-    lastname TEXT NOT NULL,
-    dob TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL PRIMARY KEY, 
-    address TEXT NOT NULL
-  )`);
+        firstname TEXT NOT NULL,
+        lastname TEXT NOT NULL,
+        dob TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL PRIMARY KEY, 
+        address TEXT NOT NULL,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS savedArticles (
-    article_name TEXT NOT NULL,
-    url TEXT NOT NULL UNIQUE,
-    email TEXT NOT NULL,
-    FOREIGN KEY (email) REFERENCES users(email),
-    PRIMARY KEY (url)
-  )`);
+        article_name TEXT NOT NULL,
+        url TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL,
+        FOREIGN KEY (email) REFERENCES users(email),
+        PRIMARY KEY (url)
+    )`);
 
-  db.run(`CREATE TABLE IF NOT EXISTS feeds (
-    feed_name TEXT NOT NULL,
-    url TEXT NOT NULL UNIQUE,
-    PRIMARY KEY (url)
-  )`);
+    db.run(`CREATE TABLE IF NOT EXISTS feeds (
+        feed_name TEXT NOT NULL,
+        url TEXT NOT NULL UNIQUE,
+        PRIMARY KEY (url)
+    )`);
 
     console.log('Tables created successfully.');
 
-    // Insert the BBC article
+    const passwordHash = bcrypt.hashSync('12345', 5); 
+    const mockUser = ['Matipa', 'Matipa', '1990-01-01', 'matipa@gmail.com', 'Happy Street', 'matipa', passwordHash];
+    db.run('INSERT OR REPLACE INTO users (firstname, lastname, dob, email, address, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)', mockUser, (err) => {
+        if (err) {
+            console.error('Error inserting mock user', err);
+        } else {
+            console.log('Mock user inserted successfully.');
+        }
+    });
+
+    // Insert the BBC articles
     const bbcArticle = ['BBC Olympics Article', 'https://www.bbc.co.uk/sport/olympics/articles/cw4yepmknkpo', 'john@gmail.com'];
     const bbcArticle2 = ['BBC Politics Article', 'https://www.bbc.co.uk/news/articles/cmj260e54x7o', 'john@gmail.com'];
 
     db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle,  (err) => {
         if (err) {
-            console.error('Error inserting BBC article', err);
+            console.error('Error inserting BBC Olympics article', err);
         } else {
-            console.log('BBC article inserted successfully.');
+            console.log('BBC Olympics article inserted successfully.');
         }
     });
 
-      // General Feeds, which will be shown on home page
-      const bbc = ['BBC', 'https://www.bbc.co.uk/'];
-      const cnn = ['CNN', 'https://edition.cnn.com/'];
-      const reuters = ['Reuters', 'https://www.reuters.com/technology/']
-  
-      feeds = [bbc, cnn, reuters]
-  
-      for(let idx =0; idx<feeds.length; idx++){
-          db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {
-              if (err) {
-                  console.error(`Error inserting ${feeds[idx][0]} article`, err);
-              } else {
-                  console.log(`${feeds[idx][0]} article inserted successfully.`);
-              }
-          });
-      }
-  
+    db.run('INSERT OR REPLACE INTO savedArticles (article_name, url, email) VALUES (?, ?, ?)', bbcArticle2,  (err) => {
+        if (err) {
+            console.error('Error inserting BBC Politics article', err);
+        } else {
+            console.log('BBC Politics article inserted successfully.');
+        }
+    });
+
+    // General Feeds, which will be shown on the home page
+    const bbc = ['BBC', 'https://www.bbc.co.uk/'];
+    const cnn = ['CNN', 'https://edition.cnn.com/'];
+    const reuters = ['Reuters', 'https://www.reuters.com/technology/'];
+
+    const feeds = [bbc, cnn, reuters];
+
+    for (let idx = 0; idx < feeds.length; idx++) {
+        db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {
+            if (err) {
+                console.error(`Error inserting ${feeds[idx][0]} feed`, err);
+            } else {
+                console.log(`${feeds[idx][0]} feed inserted successfully.`);
+            }
+        });
+    }
+
 });
 
 // API endpoints
-app.get('/feeds', (req,res) => {
+app.get('/feeds', (req, res) => {
     db.all('SELECT * FROM feeds', (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -93,7 +107,7 @@ app.get('/feeds', (req,res) => {
     });
 });
 
-app.get('/subscribedfeeds', (req,res) => {
+app.get('/subscribedfeeds', (req, res) => {
     db.all('SELECT * FROM feeds', (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -146,26 +160,26 @@ app.get('/article/:url', (req, res) => {
 app.get('/article/saved', (req, res) => {
     const { email, url } = req.query;
     db.get('SELECT * FROM savedArticles WHERE email = ? AND url = ?', [email, url], (err, row) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({ isSaved: !!row });
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ isSaved: !!row });
     });
-  });
+});
 
 app.get('/user/:email', (req, res) => {
-db.get('SELECT * FROM users WHERE email = ?', [req.params.email], (err, row) => {
-    if (err) {
-    res.status(500).json({ error: err.message });
-    return;
-    }
-    if (row) {
-    res.json(row);
-    } else {
-    res.status(404).json({ error: 'User not found' });
-    }
-});
+    db.get('SELECT * FROM users WHERE email = ?', [req.params.email], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
 });
 
 app.post('/article', (req, res) => {
@@ -194,6 +208,21 @@ app.delete('/article', (req, res) => {
             res.json({ changes: this.changes });
         }
     );
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (user && bcrypt.compareSync(password, user.password)) {
+            res.json({ success: true, message: 'Login successful', user });
+        } else {
+            res.status(401).json({ success: false, message: 'Invalid username or password' });
+        }
+    });
 });
 
 app.listen(port, () => {

@@ -95,3 +95,10 @@ export async function isFeedSaved(email, url) {
 }
 
 
+export async function getSubscribedFeeds(email) {
+  const response = await fetch(`${API_URL}/subscribedfeeds/${encodeURIComponent(email)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch subscribed feeds');
+  }
+  return response.json();
+}
