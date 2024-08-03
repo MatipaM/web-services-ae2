@@ -8,6 +8,25 @@ export async function getArticle(url) {
   return response.json();
 }
 
+export async function getFeed(url) {
+  const response = await fetch(`${API_URL}/feed/${encodeURIComponent(url)}`);
+  console.log("encodeURI", (url))
+  console.log("response",response)
+  if (!response.ok) {
+    throw new Error('Feed not found');
+  }
+
+  return response.json();
+}
+
+export async function getFeeds(){
+  const response = await fetch(`${API_URL}/feeds`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch feeds');
+  }
+  return response.json();
+}
+
 export async function getAllArticles() {
   const response = await fetch(`${API_URL}/articles`);
   if (!response.ok) {
@@ -16,6 +35,7 @@ export async function getAllArticles() {
   return response.json();
 }
 
+// turn into one generic function
 export async function saveArticle(email, articleName, url) {
   const response = await fetch(`${API_URL}/article`, {
     method: 'POST',
@@ -23,6 +43,20 @@ export async function saveArticle(email, articleName, url) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, article_name: articleName, url }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to save article');
+  }
+  return response.json();
+}
+
+export async function saveFeed(email, feed_name, url) {
+  const response = await fetch(`${API_URL}/feed`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, feed_name: feed_name, url }),
   });
   if (!response.ok) {
     throw new Error('Failed to save article');
@@ -51,3 +85,13 @@ export async function isArticleSaved(email, url) {
   }
   return response.json();
 }
+
+export async function isFeedSaved(email, url) {
+  const response = await fetch(`${API_URL}/subscribedfeeds/saved?email=${encodeURIComponent(email)}&url=${encodeURIComponent(url)}`);
+  if (!response.ok) {
+    throw new Error('Failed to check feed status');
+  }
+  return response.json();
+}
+
+

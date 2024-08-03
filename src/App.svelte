@@ -3,6 +3,7 @@
   import Home from "./pages/Home.svelte";
   import Login from "./pages/Login.svelte";
   import Feed from "./pages/Feed.svelte";
+  import SubscribedFeeds from "./pages/SubscribedFeeds.svelte";
   import Article from "./pages/Article.svelte";
   import SavedArticles from "./pages/SavedArticles.svelte";
 
@@ -13,15 +14,16 @@
   <nav>
     <Link to="/">Home</Link>
     <Link to="/login">Login</Link>
-    <Link to="/feed">Feed</Link>
+    <Link to="/subscribedfeeds">Feeds</Link>
     <Link to="/saved">Saved Articles</Link>
   </nav>
 
   <main>
     <Route path="/" component={Home} />
     <Route path="/login" component={Login} />
-    <Route path="/feed" component={Feed} />
+    <Route path="/subscribedfeeds" component={SubscribedFeeds} />
     <Route path="/article/:url" component={Article} />
+    <Route path="/feed/:url" component={Feed} />
     <Route path="/saved" component={SavedArticles} />
   </main>
 </Router>

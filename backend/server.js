@@ -43,6 +43,12 @@ db.serialize(() => {
     PRIMARY KEY (url)
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS feeds (
+    feed_name TEXT NOT NULL,
+    url TEXT NOT NULL UNIQUE,
+    PRIMARY KEY (url)
+  )`);
+
     console.log('Tables created successfully.');
 
     // Insert the BBC article
@@ -55,9 +61,47 @@ db.serialize(() => {
             console.log('BBC article inserted successfully.');
         }
     });
+
+      // General Feeds, which will be shown on home page
+      const bbc = ['BBC', 'https://www.bbc.co.uk/'];
+      const cnn = ['CNN', 'https://edition.cnn.com/'];
+      const reuters = ['Reuters', 'https://www.reuters.com/technology/']
+  
+      feeds = [bbc, cnn, reuters]
+  
+      for(let idx =0; idx<feeds.length; idx++){
+          db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {
+              if (err) {
+                  console.error(`Error inserting ${feeds[idx][0]} article`, err);
+              } else {
+                  console.log(`${feeds[idx][0]} article inserted successfully.`);
+              }
+          });
+      }
+  
 });
 
 // API endpoints
+app.get('/feeds', (req,res) => {
+    db.all('SELECT * FROM feeds', (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+app.get('/subscribedfeeds', (req,res) => {
+    db.all('SELECT * FROM feeds', (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
 app.get('/articles', (req, res) => {
     db.all('SELECT * FROM savedArticles', (err, rows) => {
         if (err) {
@@ -65,6 +109,21 @@ app.get('/articles', (req, res) => {
             return;
         }
         res.json(rows);
+    });
+});
+
+app.get('/feed/:url', (req, res) => {
+    const decodedUrl = decodeURIComponent(req.params.url);
+    db.get('SELECT * FROM feeds WHERE url = ?', [decodedUrl], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row);
+        } else {
+            res.status(404).json({ error: 'Feed not found' });
+        }
     });
 });
 
