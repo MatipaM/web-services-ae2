@@ -60,6 +60,7 @@
       border: none;
       background-color: #1b3a4b;
       color: white;
+    }
   
     button {
       width: 100%;
