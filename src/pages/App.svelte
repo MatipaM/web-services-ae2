@@ -4,6 +4,7 @@
   
 	let showLogin = true;
   </script>
+  
   <main>
 	<button on:click={() => showLogin = !showLogin}>
 	  {showLogin ? 'Switch to Register' : 'Switch to Login'}
