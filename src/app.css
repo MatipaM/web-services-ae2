@@ -1,11 +1,11 @@
 :root {
-  --primary-color: #bb86fc;  /* Lighter purple */
+  --primary-color: #bb86fc; 
   --secondary-color: #03dac6;
   --background-color: #121212;
   --surface-color: #1e1e1e;
   --on-surface-color: #e0e0e0;
   --on-primary-color: #000000;
-  --nav-color: #8b61c9;  /* Even lighter purple for nav */
+  --nav-color: #8b61c9; 
 }
 
 body {
