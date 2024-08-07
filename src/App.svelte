@@ -10,30 +10,24 @@
   export let url = "";
 </script>
 
-<Router url={url}>
-  <nav>
-    <Link to="/">Home</Link>
-    <Link to="/login">Login</Link>
-    <Link to="/subscribedfeeds">Feeds</Link>
-    <Link to="/saved">Saved Articles</Link>
-  </nav>
+<Router {url}>
+  <div class="feed-reader">
+    <header class="feed-reader__header">
+      <nav class="feed-reader__nav">
+        <Link class="feed-reader__nav-link" to="/">Home</Link>
+        <Link class="feed-reader__nav-link" to="/login">Login</Link>
+        <Link class="feed-reader__nav-link" to="/subscribedfeeds">Feeds</Link>
+        <Link class="feed-reader__nav-link" to="/saved">Saved Articles</Link>
+      </nav>
+    </header>
 
-  <main>
-    <Route path="/" component={Home} />
-    <Route path="/login" component={Login} />
-    <Route path="/subscribedfeeds" component={SubscribedFeeds} />
-    <Route path="/article/:url" component={Article} />
-    <Route path="/feed/:url" component={Feed} />
-    <Route path="/saved" component={SavedArticles} />
-  </main>
+    <main class="feed-reader__main">
+      <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/subscribedfeeds" component={SubscribedFeeds} />
+      <Route path="/article/:url" component={Article} />
+      <Route path="/feed/:url" component={Feed} />
+      <Route path="/saved" component={SavedArticles} />
+    </main>
+  </div>
 </Router>
-
-<style>
-  nav {
-    padding: 1em;
-    background-color: #f0f0f0;
-  }
-  main {
-    padding: 1em;
-  }
-</style>

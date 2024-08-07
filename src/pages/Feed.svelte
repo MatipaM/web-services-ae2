@@ -13,12 +13,13 @@
     $: currentUserEmail = $userEmail;
 
     onMount(async () => {
-         console.log("is running")
+        console.log("is running");
         try {
             feed = await getFeed(decodeURIComponent(url));
-            console.log("feed",feed)
+            console.log("feed", feed);
         } catch (e) {
-            console.log(e)
+            console.log(e);
+            error = e.message;
         } finally {
             loading = false;
         }
@@ -33,6 +34,7 @@
             await saveFeed({
                 feed_name: feed.feed_name,
                 url: feed.url,
+                email: currentUserEmail
             });
             isSaved = true;
             alert("Article saved successfully!");
