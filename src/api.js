@@ -36,13 +36,13 @@ export async function getAllArticles() {
 }
 
 // turn into one generic function
-export async function saveArticle(email, articleName, url) {
+export async function saveArticle({ email, article_name, url }) {
   const response = await fetch(`${API_URL}/article`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, article_name: articleName, url }),
+    body: JSON.stringify({ email, article_name, url }),
   });
   if (!response.ok) {
     throw new Error('Failed to save article');
