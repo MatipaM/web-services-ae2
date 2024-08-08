@@ -19,33 +19,32 @@
   const saltRounds = 10;
 
   function handleSubmit(event) {
-    event.preventDefault();
-    
-    fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, firstname, lastname, dob, email, address, password })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("data", data);
-      if (data.success) {
-        if (h1) {
-          h1.innerHTML = 'You have been registered, please login';
-        }
-        login(data.user.email);
-        navigate('/'); 
-      } else {
-        errorMessage = data.message;
+  event.preventDefault();
+  
+  fetch('http://localhost:3000/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, firstname, lastname, dob, email, address, password })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("data", data);
+    if (data.success) {
+      if (h1) {
+        h1.innerHTML = 'You have been registered, please login';
       }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      errorMessage = 'An error occurred. Please try again.';
-    });
-  }
+      navigate('/login');
+    } else {
+      errorMessage = data.message || 'Registration failed. Please try again.';
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    errorMessage = 'An error occurred. Please try again.';
+  });
+}
 
   function handleLogout() {
     logout();

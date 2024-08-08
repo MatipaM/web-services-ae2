@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -274,13 +274,24 @@ app.post('/login', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {username, firstname, lastname, dob, email, address, password} = req.body;
-    db.run('INSERT INTO users (username, firstname, lastname, dob, email, address, password) VALUES (?,?,?,?,?,?,?)', [username, firstname, lastname, dob, email, address, password], (err, user) => {
+    
+    bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }else{
-            res.json({ success: true, message: 'Login successful', user });
+            return res.status(500).json({ success: false, message: 'Error hashing password' });
         }
+
+        db.run('INSERT INTO users (username, firstname, lastname, dob, email, address, password) VALUES (?,?,?,?,?,?,?)', 
+            [username, firstname, lastname, dob, email, address, hash], 
+            function(err) {
+                if (err) {
+                    if (err.message.includes('UNIQUE constraint failed')) {
+                        return res.status(400).json({ success: false, message: 'Username or email already exists' });
+                    }
+                    return res.status(500).json({ success: false, message: 'Error registering user' });
+                }
+                res.json({ success: true, message: 'User registered successfully' });
+            }
+        );
     });
 });
 
