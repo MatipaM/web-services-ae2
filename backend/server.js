@@ -97,23 +97,67 @@ db.serialize(() => {
 });
 
 // API endpoints
-app.get('/feeds', (req, res) => {
-    db.all('SELECT * FROM feeds', (err, rows) => {
+app.get('/feeds-with-articles', (req, res) => {
+    db.all('SELECT * FROM feeds', (err, feeds) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json(rows);
+        
+        const feedPromises = feeds.map(feed => {
+            return new Promise((resolve, reject) => {
+                db.all('SELECT article_name, url FROM savedArticles WHERE url LIKE ? LIMIT 5', [`${feed.url}%`], (err, articles) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            ...feed,
+                            articles: articles
+                        });
+                    }
+                });
+            });
+        });
+
+        Promise.all(feedPromises)
+            .then(feedsWithArticles => {
+                res.json(feedsWithArticles);
+            })
+            .catch(error => {
+                res.status(500).json({ error: error.message });
+            });
     });
 });
 
-app.get('/subscribedfeeds', (req, res) => {
-    db.all('SELECT * FROM feeds', (err, rows) => {
+app.get('/subscribed-feeds-with-articles', (req, res) => {
+    db.all('SELECT * FROM feeds', (err, feeds) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json(rows);
+        
+        const feedPromises = feeds.map(feed => {
+            return new Promise((resolve, reject) => {
+                db.all('SELECT article_name, url FROM savedArticles WHERE url LIKE ? LIMIT 5', [`${feed.url}%`], (err, articles) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            ...feed,
+                            articles: articles
+                        });
+                    }
+                });
+            });
+        });
+
+        Promise.all(feedPromises)
+            .then(feedsWithArticles => {
+                res.json(feedsWithArticles);
+            })
+            .catch(error => {
+                res.status(500).json({ error: error.message });
+            });
     });
 });
 

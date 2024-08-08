@@ -19,10 +19,18 @@ export async function getFeed(url) {
   return response.json();
 }
 
-export async function getFeeds(){
-  const response = await fetch(`${API_URL}/feeds`);
+export async function getFeeds() {
+  const response = await fetch(`${API_URL}/feeds-with-articles`);
   if (!response.ok) {
-    throw new Error('Failed to fetch feeds');
+    throw new Error('Failed to fetch feeds with articles');
+  }
+  return response.json();
+}
+
+export async function getSubscribedFeeds(email) {
+  const response = await fetch(`${API_URL}/subscribed-feeds-with-articles?email=${encodeURIComponent(email)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch subscribed feeds with articles');
   }
   return response.json();
 }
@@ -104,15 +112,6 @@ export async function isFeedSaved(email, url) {
   const response = await fetch(`${API_URL}/subscribedfeeds/saved?email=${encodeURIComponent(email)}&url=${encodeURIComponent(url)}`);
   if (!response.ok) {
     throw new Error('Failed to check feed status');
-  }
-  return response.json();
-}
-
-
-export async function getSubscribedFeeds(email) {
-  const response = await fetch(`${API_URL}/feeds`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch subscribed feeds');
   }
   return response.json();
 }
