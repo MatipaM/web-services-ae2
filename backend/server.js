@@ -225,17 +225,13 @@ app.post('/login', (req, res) => {
     });
 });
 
+
 app.post('/register', (req, res) => {
     const {username, firstname, lastname, dob, email, address, password} = req.body;
-    db.get('INSERT username, firstname, lastname, dob, email, address, password () VALUES = ?,?,?,?,?,?,?', [username, firstname, lastname, dob, email, address, password], (err, user) => {
+    db.run('INSERT INTO users (username, firstname, lastname, dob, email, address, password) VALUES (?,?,?,?,?,?,?)', [username, firstname, lastname, dob, email, address, password], (err, user) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
-        }
-        if (user && bcrypt.compareSync(password, user.password)) {
-            res.json({ success: true, message: 'Registration successful', user });
-        } else {
-            res.status(401).json({ success: false, message: 'Invalid username or password' });
         }
     });
 });

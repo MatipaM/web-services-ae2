@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import {navigate} from 'svelte-routing';
     import { login, logout, isAuthenticated, user } from '../stores/auth.js';
     
     let username = '';
@@ -17,7 +18,7 @@
     function handleSubmit(event) {
       event.preventDefault();
       
-      fetch('http://localhost:5173/register', {
+      fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -26,9 +27,11 @@
       })
       .then(response => response.json())
       .then(data => {
+        console.log("data",data)
         if (data.success) {
           login(data.user.email);
-          errorMessage = '';
+          errorMessage = 'logged in successfully';
+          navigate('/');
         } else {
           errorMessage = data.message;
         }
