@@ -234,6 +234,8 @@ app.post('/register', (req, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
+        }else{
+            res.json({ success: true, message: 'Login successful', user });
         }
     });
 });

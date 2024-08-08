@@ -17,7 +17,6 @@ export function login(email) {
   localStorage.setItem('user', JSON.stringify(userData));
   isAuthenticated.set(true);
   user.set(userData);
-  navigate('/')
 }
 
 export function logout() {
