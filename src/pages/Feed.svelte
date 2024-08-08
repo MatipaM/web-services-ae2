@@ -44,7 +44,7 @@
             isSaved = true;
             alert("Article saved successfully!");
         } catch (e) {
-            alert("Error saving article: " + e.message);
+            alert("Error saving article: " + e.message +title+description);
         }
     }
 </script>
@@ -65,16 +65,16 @@
         {#each Object.entries(dictionary) as [key, value]}
             <p class='feed-box'>
                 <strong>{key}</strong>: {value}
-                <button on:click={handleSubscribe(key, value)}>Save</button>
+                <button on:click={() => handleSubscribe(key, value)}>Save</button>
             <p>
                 
         {/each}
     </ul>
     
 
-    <button on:click={handleSubscribe}>
+    <!-- <button on:click={handleSubscribe}>
         {isSaved ? "Unsubscribe to feed" : "Subscribe to feed"}
-    </button>
+    </button> -->
 
 {:else}
     <p>No feed found</p>

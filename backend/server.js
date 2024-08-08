@@ -37,7 +37,7 @@ db.serialize(() => {
         url TEXT NOT NULL UNIQUE,
         email TEXT NOT NULL,
         FOREIGN KEY (email) REFERENCES users(email),
-        PRIMARY KEY (url)
+        PRIMARY KEY (article_name)
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS feeds (
