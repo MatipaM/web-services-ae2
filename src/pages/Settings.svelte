@@ -8,6 +8,7 @@
     let newFeedUrl = '';
     let error = '';
     let successMessage = '';
+    let remainingFeeds = []
   
     $: currentUserEmail = $userEmail;
   
@@ -36,18 +37,20 @@
         newFeedUrl = '';
         successMessage = 'Feed added successfully!';
         error = '';
+        remainingFeeds = remainingFeeds.filter(item => item !== newFeedName);
       } catch (e) {
         error = 'Failed to add feed. Please try again.';
         successMessage = '';
       }
     }
   
-    async function handleRemoveFeed(feedUrl) {
+    async function handleRemoveFeed(feed) {
       try {
-        await unsaveFeed(currentUserEmail, feedUrl);
+        await unsaveFeed(currentUserEmail, feed.url);
         await loadSubscribedFeeds();
         successMessage = 'Feed removed successfully!';
         error = '';
+        remainingFeeds.push(feed.feed_name)
       } catch (e) {
         error = 'Failed to remove feed. Please try again.';
         successMessage = '';
@@ -74,7 +77,7 @@
         <p class="success">{successMessage}</p>
       {/if}
   
-      <div class="add-feed">
+      <!-- <div class="add-feed">
         <h3>Add New Feed</h3>
         <input
           type="text"
@@ -87,7 +90,21 @@
           bind:value={newFeedUrl}
         />
         <button on:click={handleAddFeed}>Add Feed</button>
-      </div>
+      </div>  -->
+
+
+<div class="add-feed">
+  <h3>Add New Feed</h3>
+
+  <select bind:value={remainingFeeds} placeholder="Select Feed">
+      <option value="" disabled>Select Feed</option>
+      {#each remainingFeeds as feed}
+          <option value={feed.url}>{feed.feed_name}</option>
+      {/each}
+  </select>
+
+  <button on:click={handleAddFeed}>Add Feed</button>
+</div>
   
       <div class="subscribed-feeds">
         <h3>Your Subscribed Feeds</h3>
@@ -99,7 +116,7 @@
               <li>
                 <span>{feed.feed_name}</span>
                 <a href={feed.url} target="_blank" rel="noopener noreferrer">{feed.url}</a>
-                <button on:click={() => handleRemoveFeed(feed.url)}>Remove</button>
+                <button on:click={() => handleRemoveFeed(feed)}>Remove</button>
               </li>
             {/each}
           </ul>

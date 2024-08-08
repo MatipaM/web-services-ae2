@@ -1,27 +1,29 @@
-.article-container {
-    display: flex;
-    flex-wrap: wrap;
+.feeds-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
-    justify-content: center;
 }
 
-.article-box {
-    background: white;
+.feed-box {
     border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    width: 200px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 15px;
+    border-radius: 5px;
 }
 
-.article-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.article-list {
+    list-style-type: none;
+    padding: 0;
 }
 
-.article-link {
+.article-list li {
+    margin-bottom: 5px;
+}
+
+.feed-link, .article-link {
+    color: #0066cc;
     text-decoration: none;
-    color: #333;
-    font-weight: bold;
+}
+
+.feed-link:hover, .article-link:hover {
+    text-decoration: underline;
 }

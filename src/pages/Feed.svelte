@@ -1,7 +1,8 @@
 <script>
     import { onMount } from "svelte";
-    import { getFeed, saveFeed, isArticleSaved } from "../api.js";
+    import { getFeed, saveFeed, isArticleSaved, isFeedSaved, saveArticle } from "../api.js";
     import { userEmail } from "../stores/auth.js"; 
+    import {RSSParser} from "../RSSParser.js"; 
 
     export let url = "";
 
@@ -9,37 +10,41 @@
     let error = null;
     let loading = true;
     let isSaved = false;
+    let dictionary = {}
 
     $: currentUserEmail = $userEmail;
 
     onMount(async () => {
-        console.log("is running");
+         console.log("is running")
         try {
             feed = await getFeed(decodeURIComponent(url));
-            console.log("feed", feed);
+
+            const parser = new RSSParser(feed.name);
+            dictionary = await parser.displayArticle();
+            // parser.displayFeed();
+
         } catch (e) {
-            console.log(e);
-            error = e.message;
+            console.log(e)
         } finally {
             loading = false;
         }
     });
 
-    async function handleSubscribe() {
+    async function handleSubscribe(title, description) {
         if (!currentUserEmail) {
             alert("Please log in to subscribe to feeds");
             return;
         }
         try {
-            await saveFeed({
-                feed_name: feed.feed_name,
+            await saveArticle({
+                email: currentUserEmail,
+                article_name: `${title}: ${description}`,
                 url: feed.url,
-                email: currentUserEmail
             });
             isSaved = true;
             alert("Article saved successfully!");
         } catch (e) {
-            alert("Error saving article: " + e.message);
+            alert("Error saving article: " + e.message +title+description);
         }
     }
 </script>
@@ -48,7 +53,7 @@
     <p>Loading feed...</p>
 {:else if error}
     <p>Error: {error}</p>
-{:else if feed}
+{:else if dictionary!={}}
     <h1>{feed.feed_name}</h1>
     <p>
         URL: <a href={feed.url} target="_blank" rel="noopener noreferrer"
@@ -56,10 +61,22 @@
         >
     </p>
 
-    <button on:click={handleSubscribe}>
+    <ul>
+        {#each Object.entries(dictionary) as [key, value]}
+            <p class='feed-box'>
+                <strong>{key}</strong>: {value}
+                <button on:click={() => handleSubscribe(key, value)}>Save</button>
+            <p>
+                
+        {/each}
+    </ul>
+    
+
+    <!-- <button on:click={handleSubscribe}>
         {isSaved ? "Unsubscribe to feed" : "Subscribe to feed"}
-    </button>
+    </button> -->
 
 {:else}
     <p>No feed found</p>
 {/if}
+

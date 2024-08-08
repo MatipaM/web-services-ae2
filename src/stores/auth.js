@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import {navigate} from 'svelte-routing';
 
 export const isAuthenticated = writable(false);
 export const user = writable(null);
@@ -23,4 +24,5 @@ export function logout() {
   isAuthenticated.set(false);
   user.set(null);
 }
+
 

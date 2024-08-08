@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
+
 const app = express();
 const port = 3000;
 
@@ -36,7 +37,7 @@ db.serialize(() => {
         url TEXT NOT NULL UNIQUE,
         email TEXT NOT NULL,
         FOREIGN KEY (email) REFERENCES users(email),
-        PRIMARY KEY (url)
+        PRIMARY KEY (article_name)
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS feeds (
@@ -45,10 +46,18 @@ db.serialize(() => {
         PRIMARY KEY (url)
     )`);
 
+    db.run(`CREATE TABLE IF NOT EXISTS subscribedFeeds (
+        feed_name TEXT NOT NULL,
+        url TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL,
+        FOREIGN KEY (email) REFERENCES users(email),
+        PRIMARY KEY (url)
+    )`);
+
     console.log('Tables created successfully.');
 
-    const passwordHash = bcrypt.hashSync('12345', 5); 
-    const mockUser = ['Matipa', 'Matipa', '1990-01-01', 'matipa@gmail.com', 'Happy Street', 'matipa', passwordHash];
+    // const passwordHash = bcrypt.hashSync('12345', 5); 
+    const mockUser = ['Matipa', 'Matipa', '1990-01-01', 'matipa@gmail.com', 'Happy Street', 'matipa', '12345'];
     db.run('INSERT OR REPLACE INTO users (firstname, lastname, dob, email, address, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)', mockUser, (err) => {
         if (err) {
             console.error('Error inserting mock user', err);
@@ -78,11 +87,11 @@ db.serialize(() => {
     });
 
     // General Feeds, which will be shown on the home page
-    const bbc = ['BBC', 'https://www.bbc.co.uk/'];
-    const cnn = ['CNN', 'https://edition.cnn.com/'];
-    const reuters = ['Reuters', 'https://www.reuters.com/technology/'];
+    const bbc = ['BBC', 'http://feeds.bbci.co.uk/news/rss.xml'];
+    const cnn = ['CNN', 'http://rss.cnn.com/rss/cnn_topstories.rss'];
+    const nytimes = ['NyTimes','https://rss.nytimes.com/services/xml/rss/nyt/World.xml'];
 
-    const feeds = [bbc, cnn, reuters];
+    const feeds = [bbc, cnn, nytimes];
 
     for (let idx = 0; idx < feeds.length; idx++) {
         db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {
@@ -97,23 +106,67 @@ db.serialize(() => {
 });
 
 // API endpoints
-app.get('/feeds', (req, res) => {
-    db.all('SELECT * FROM feeds', (err, rows) => {
+app.get('/feeds-with-articles', (req, res) => {
+    db.all('SELECT * FROM feeds', (err, feeds) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json(rows);
+        
+        const feedPromises = feeds.map(feed => {
+            return new Promise((resolve, reject) => {
+                db.all('SELECT article_name, url FROM savedArticles WHERE url LIKE ? LIMIT 5', [`${feed.url}%`], (err, articles) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            ...feed,
+                            articles: articles
+                        });
+                    }
+                });
+            });
+        });
+
+        Promise.all(feedPromises)
+            .then(feedsWithArticles => {
+                res.json(feedsWithArticles);
+            })
+            .catch(error => {
+                res.status(500).json({ error: error.message });
+            });
     });
 });
 
-app.get('/subscribedfeeds', (req, res) => {
-    db.all('SELECT * FROM feeds', (err, rows) => {
+app.get('/subscribed-feeds-with-articles', (req, res) => {
+    db.all('SELECT * FROM feeds', (err, feeds) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json(rows);
+        
+        const feedPromises = feeds.map(feed => {
+            return new Promise((resolve, reject) => {
+                db.all('SELECT article_name, url FROM savedArticles WHERE url LIKE ? LIMIT 5', [`${feed.url}%`], (err, articles) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            ...feed,
+                            articles: articles
+                        });
+                    }
+                });
+            });
+        });
+
+        Promise.all(feedPromises)
+            .then(feedsWithArticles => {
+                res.json(feedsWithArticles);
+            })
+            .catch(error => {
+                res.status(500).json({ error: error.message });
+            });
     });
 });
 
@@ -184,8 +237,24 @@ app.get('/user/:email', (req, res) => {
 
 app.post('/article', (req, res) => {
     const { email, article_name, url } = req.body;
-    db.run('INSERT OR REPLACE INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)',
+    db.run('INSERT INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)',
         [email, article_name, url],
+        function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+
+
+app.post('/feed', (req, res) => {
+    const { email, feed_name, url } = req.body;
+    db.run('INSERT INTO subscribedFeeds (email, feed_name, url) VALUES (?, ?, ?)',
+        [email, feed_name, url],
         function (err) {
             if (err) {
                 res.status(500).json({ error: err.message });
@@ -217,9 +286,11 @@ app.post('/login', (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
-        if (user && bcrypt.compareSync(password, user.password)) {
+        // if (user && bcrypt.compareSync(password, user.password)) {
+        if (user && password) {
             res.json({ success: true, message: 'Login successful', user });
         } else {
+            console.log(username, password)
             res.status(401).json({ success: false, message: 'Invalid username or password' });
         }
     });
@@ -228,11 +299,24 @@ app.post('/login', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {username, firstname, lastname, dob, email, address, password} = req.body;
-    db.run('INSERT INTO users (username, firstname, lastname, dob, email, address, password) VALUES (?,?,?,?,?,?,?)', [username, firstname, lastname, dob, email, address, password], (err, user) => {
+    
+    bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+            return res.status(500).json({ success: false, message: 'Error hashing password' });
         }
+
+        db.run('INSERT INTO users (username, firstname, lastname, dob, email, address, password) VALUES (?,?,?,?,?,?,?)', 
+            [username, firstname, lastname, dob, email, address, hash], 
+            function(err) {
+                if (err) {
+                    if (err.message.includes('UNIQUE constraint failed')) {
+                        return res.status(400).json({ success: false, message: 'Username or email already exists' });
+                    }
+                    return res.status(500).json({ success: false, message: 'Error registering user' });
+                }
+                res.json({ success: true, message: 'User registered successfully' });
+            }
+        );
     });
 });
 

@@ -19,10 +19,18 @@ export async function getFeed(url) {
   return response.json();
 }
 
-export async function getFeeds(){
-  const response = await fetch(`${API_URL}/feeds`);
+export async function getFeeds() {
+  const response = await fetch(`${API_URL}/feeds-with-articles`);
   if (!response.ok) {
-    throw new Error('Failed to fetch feeds');
+    throw new Error('Failed to fetch feeds with articles');
+  }
+  return response.json();
+}
+
+export async function getSubscribedFeeds(email) {
+  const response = await fetch(`${API_URL}/subscribed-feeds-with-articles?email=${encodeURIComponent(email)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch subscribed feeds with articles');
   }
   return response.json();
 }
@@ -56,13 +64,14 @@ export async function saveFeed(email, feed_name, url) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, feed_name: feed_name, url }),
+    body: JSON.stringify({ email,feed_name, url }),
   });
   if (!response.ok) {
-    throw new Error('Failed to save article');
+    throw new Error('Failed to save feed');
   }
   return response.json();
 }
+
 
 export async function unsaveFeed(email, url) {
   const response = await fetch(`${API_URL}/feed`, {
@@ -77,6 +86,7 @@ export async function unsaveFeed(email, url) {
   }
   return response.json();
 }
+
 
 export async function unsaveArticle(email, url) {
   const response = await fetch(`${API_URL}/article`, {
@@ -104,15 +114,6 @@ export async function isFeedSaved(email, url) {
   const response = await fetch(`${API_URL}/subscribedfeeds/saved?email=${encodeURIComponent(email)}&url=${encodeURIComponent(url)}`);
   if (!response.ok) {
     throw new Error('Failed to check feed status');
-  }
-  return response.json();
-}
-
-
-export async function getSubscribedFeeds(email) {
-  const response = await fetch(`${API_URL}/feeds`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch subscribed feeds');
   }
   return response.json();
 }
