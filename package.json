@@ -47,6 +47,9 @@
     "sqlite3": "^5.1.7",
     "svelte-routing": "^2.13.0"
   },
+  "engines": {
+  "node": ">=18.0.0"
+  },
   "description": "This template should help get you started developing with Svelte in Vite.",
   "main": "svelte.config.js",
   "keywords": [],
