@@ -64,6 +64,20 @@ export async function saveFeed(email, feed_name, url) {
   return response.json();
 }
 
+export async function unsaveFeed(email, url) {
+  const response = await fetch(`${API_URL}/feed`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, url }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to unsave feed');
+  }
+  return response.json();
+}
+
 export async function unsaveArticle(email, url) {
   const response = await fetch(`${API_URL}/article`, {
     method: 'DELETE',
