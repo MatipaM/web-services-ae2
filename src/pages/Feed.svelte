@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { getFeed, saveFeed, isArticleSaved, isFeedSaved, saveArticle } from "../api.js";
     import { userEmail } from "../stores/auth.js"; 
-    import {RSSParser} from "../RSSParser.js"; 
+    //import {RSSParser} from "../RSSParser.js"; 
 
     export let url = "";
 
@@ -19,8 +19,8 @@
         try {
             feed = await getFeed(decodeURIComponent(url));
 
-            const parser = new RSSParser(feed.name);
-            dictionary = await parser.displayArticle();
+            // const parser = new RSSParser(feed.name);
+            // dictionary = await parser.displayArticle();
             // parser.displayFeed();
 
         } catch (e) {

@@ -249,21 +249,27 @@ app.post('/article', (req, res) => {
     );
 });
 
-
-
 app.post('/feed', (req, res) => {
     const { email, feed_name, url } = req.body;
+
+    if (!email || !feed_name || !url) {
+        return res.status(400).json({ error: 'Missing required fields: email, feed_name, or url' });
+    }
+
     db.run('INSERT INTO subscribedFeeds (email, feed_name, url) VALUES (?, ?, ?)',
         [email, feed_name, url],
         function (err) {
             if (err) {
-                res.status(500).json({ error: err.message });
+                console.error('Error inserting into subscribedFeeds:', err.message);
+                res.status(500).json({ error: 'Failed to save feed', details: err.message });
                 return;
             }
             res.json({ id: this.lastID });
         }
     );
 });
+
+
 
 app.delete('/article', (req, res) => {
     const { email, url } = req.body;
