@@ -10,6 +10,7 @@
     let error = null;
     let loading = true;
     let isSaved = false;
+    let dictionary = {}
 
     $: currentUserEmail = $userEmail;
 
@@ -18,8 +19,8 @@
         try {
             feed = await getFeed(decodeURIComponent(url));
 
-            const parser = new RSSParser(feed.url);
-            await parser.fetchData();
+            const parser = new RSSParser(feed.name);
+            dictionary = await parser.displayArticle();
             // parser.displayFeed();
 
         } catch (e) {
@@ -51,7 +52,7 @@
     <p>Loading feed...</p>
 {:else if error}
     <p>Error: {error}</p>
-{:else if feed}
+{:else if dictionary!={}}
     <h1>{feed.feed_name}</h1>
     <p>
         URL: <a href={feed.url} target="_blank" rel="noopener noreferrer"
@@ -59,6 +60,13 @@
         >
     </p>
 
+    <ul>
+        {#each Object.entries(dictionary) as [key, value]}
+            <li>
+                <strong>{key}</strong>: {value}
+            </li>
+        {/each}
+    </ul>
     
 
     <button on:click={handleSubscribe}>

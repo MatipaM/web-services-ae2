@@ -1,24 +1,18 @@
-import {cnn} from './rss/cnn_topstories';
+import {cnn} from './rss/cnn';
+import {bbc} from './rss/bbc';
+import {nytimes} from './rss/nytimes';
 
 
 export class RSSParser {
-    constructor(url) {
-        this.url = '../';
-        this.feedData = null;
+    constructor(name) {
+        this.fileName = name
     }
 
 
-    async fetchData() {
-        try {
-            let fileContents = cnn
-            this.displayFeed(cnn)
-    
-        } catch (error) {
-            console.error(`Error: ${error.message}`);
-        }
-    }
-    
-    async displayFeed(fileContents) {
+    async displayArticle() {
+        // let fileContents = fileName
+        let fileContents = cnn
+
         let titles = [];
         let descriptions = [];
     
@@ -27,7 +21,7 @@ export class RSSParser {
     
         while (start < end) {
             // Find positions of title tags
-            const titlePosStart = fileContents.indexOf("<title>", start) + 7;
+            const titlePosStart = fileContents.indexOf("<title>", start) + 17;
             const titlePosEnd = fileContents.indexOf("</title>", titlePosStart)-5;
     
             // Find positions of description tags
@@ -41,7 +35,9 @@ export class RSSParser {
     
             // Extract title and description
             const title = fileContents.slice(titlePosStart, titlePosEnd).trim();
-            const description = fileContents.slice(descriptionPosStart, descriptionPosEnd).trim();
+            let description = fileContents.slice(descriptionPosStart, descriptionPosEnd).trim();
+            description = description.replace(`<![CDATA[`,` `)
+            console.log(description)
     
             // Push to arrays
             titles.push(title);
@@ -53,7 +49,17 @@ export class RSSParser {
     
         // Log results (or handle them as needed)
         console.log("Titles:", titles);
-        console.log("Descriptions:", descriptions);
+
+        let dictionary = {};
+
+        for (let i = 2; i < titles.length; i++) {
+            dictionary[titles[i]] = descriptions[i];
+}
+        console.log("Descriptions:", dictionary);
+        return dictionary
+        // return(titles, description)
     }
+
+   
 
 }

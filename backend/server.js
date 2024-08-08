@@ -81,10 +81,9 @@ db.serialize(() => {
     // General Feeds, which will be shown on the home page
     const bbc = ['BBC', 'http://feeds.bbci.co.uk/news/rss.xml'];
     const cnn = ['CNN', 'http://rss.cnn.com/rss/cnn_topstories.rss'];
-    const reuters = ['Reuters', 'http://feeds.reuters.com/reuters/topNews'];
     const nytimes = ['NyTimes','https://rss.nytimes.com/services/xml/rss/nyt/World.xml'];
 
-    const feeds = [nytimes, cnn, reuters, nytimes];
+    const feeds = [bbc, cnn, nytimes];
 
     for (let idx = 0; idx < feeds.length; idx++) {
         db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {
