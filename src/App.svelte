@@ -7,6 +7,7 @@
   import Article from "./pages/Article.svelte";
   import SavedArticles from "./pages/SavedArticles.svelte";
   import Register from "./pages/Register.svelte";
+  import Settings from "./pages/Settings.svelte"; 
 
   export let url = "";
 </script>
@@ -20,6 +21,7 @@
         <Link class="feed-reader__nav-link" to="/register">Register</Link>
         <Link class="feed-reader__nav-link" to="/subscribedfeeds">Feeds</Link>
         <Link class="feed-reader__nav-link" to="/saved">Saved Articles</Link>
+        <Link class="feed-reader__nav-link" to="/settings">Settings</Link>
       </nav>
     </header>
 
@@ -31,6 +33,7 @@
       <Route path="/article/:url" component={Article} />
       <Route path="/feed/:url" component={Feed} />
       <Route path="/saved" component={SavedArticles} />
+      <Route path="/settings" component={Settings} /> 
     </main>
   </div>
 </Router>
