@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
+
 const app = express();
 const port = 3000;
 
@@ -78,11 +79,12 @@ db.serialize(() => {
     });
 
     // General Feeds, which will be shown on the home page
-    const bbc = ['BBC', 'https://www.bbc.co.uk/'];
-    const cnn = ['CNN', 'https://edition.cnn.com/'];
-    const reuters = ['Reuters', 'https://www.reuters.com/technology/'];
+    const bbc = ['BBC', 'http://feeds.bbci.co.uk/news/rss.xml'];
+    const cnn = ['CNN', 'http://rss.cnn.com/rss/cnn_topstories.rss'];
+    const reuters = ['Reuters', 'http://feeds.reuters.com/reuters/topNews'];
+    const nytimes = ['NyTimes','https://rss.nytimes.com/services/xml/rss/nyt/World.xml'];
 
-    const feeds = [bbc, cnn, reuters];
+    const feeds = [nytimes, cnn, reuters, nytimes];
 
     for (let idx = 0; idx < feeds.length; idx++) {
         db.run('INSERT OR REPLACE INTO feeds (feed_name, url) VALUES (?, ?)', feeds[idx], (err) => {

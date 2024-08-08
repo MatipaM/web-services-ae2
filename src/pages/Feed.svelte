@@ -1,7 +1,8 @@
 <script>
     import { onMount } from "svelte";
-    import { getFeed, saveFeed, isArticleSaved } from "../api.js";
+    import { getFeed, saveFeed, isArticleSaved, isFeedSaved } from "../api.js";
     import { userEmail } from "../stores/auth.js"; 
+    import {RSSParser} from "../RSSParser.js"; 
 
     export let url = "";
 
@@ -13,13 +14,16 @@
     $: currentUserEmail = $userEmail;
 
     onMount(async () => {
-        console.log("is running");
+         console.log("is running")
         try {
             feed = await getFeed(decodeURIComponent(url));
-            console.log("feed", feed);
+
+            const parser = new RSSParser(feed.url);
+            await parser.fetchData();
+            // parser.displayFeed();
+
         } catch (e) {
-            console.log(e);
-            error = e.message;
+            console.log(e)
         } finally {
             loading = false;
         }
@@ -34,7 +38,6 @@
             await saveFeed({
                 feed_name: feed.feed_name,
                 url: feed.url,
-                email: currentUserEmail
             });
             isSaved = true;
             alert("Article saved successfully!");
@@ -56,6 +59,8 @@
         >
     </p>
 
+    
+
     <button on:click={handleSubscribe}>
         {isSaved ? "Unsubscribe to feed" : "Subscribe to feed"}
     </button>
@@ -63,3 +68,4 @@
 {:else}
     <p>No feed found</p>
 {/if}
+
