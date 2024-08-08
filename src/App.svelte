@@ -19,7 +19,7 @@
         <Link class="feed-reader__nav-link" to="/">Home</Link>
         <Link class="feed-reader__nav-link" to="/login">Login</Link>
         <Link class="feed-reader__nav-link" to="/register">Register</Link>
-        <Link class="feed-reader__nav-link" to="/subscribedfeeds">Feeds</Link>
+        <Link class="feed-reader__nav-link" to="/subscribedfeeds">Saved Feeds</Link>
         <Link class="feed-reader__nav-link" to="/saved">Saved Articles</Link>
         <Link class="feed-reader__nav-link" to="/settings">Settings</Link>
       </nav>

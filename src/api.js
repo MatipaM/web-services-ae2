@@ -64,13 +64,14 @@ export async function saveFeed(email, feed_name, url) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, feed_name: feed_name, url }),
+    body: JSON.stringify({ email,feed_name, url }),
   });
   if (!response.ok) {
-    throw new Error('Failed to save article');
+    throw new Error('Failed to save feed');
   }
   return response.json();
 }
+
 
 export async function unsaveFeed(email, url) {
   const response = await fetch(`${API_URL}/feed`, {
@@ -85,6 +86,7 @@ export async function unsaveFeed(email, url) {
   }
   return response.json();
 }
+
 
 export async function unsaveArticle(email, url) {
   const response = await fetch(`${API_URL}/article`, {

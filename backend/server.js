@@ -46,6 +46,14 @@ db.serialize(() => {
         PRIMARY KEY (url)
     )`);
 
+    db.run(`CREATE TABLE IF NOT EXISTS subscribedFeeds (
+        feed_name TEXT NOT NULL,
+        url TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL,
+        FOREIGN KEY (email) REFERENCES users(email),
+        PRIMARY KEY (url)
+    )`);
+
     console.log('Tables created successfully.');
 
     // const passwordHash = bcrypt.hashSync('12345', 5); 
@@ -229,8 +237,24 @@ app.get('/user/:email', (req, res) => {
 
 app.post('/article', (req, res) => {
     const { email, article_name, url } = req.body;
-    db.run('INSERT OR REPLACE INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)',
+    db.run('INSERT INTO savedArticles (email, article_name, url) VALUES (?, ?, ?)',
         [email, article_name, url],
+        function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+
+
+app.post('/feed', (req, res) => {
+    const { email, feed_name, url } = req.body;
+    db.run('INSERT INTO subscribedFeeds (email, feed_name, url) VALUES (?, ?, ?)',
+        [email, feed_name, url],
         function (err) {
             if (err) {
                 res.status(500).json({ error: err.message });

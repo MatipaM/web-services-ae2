@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { getFeed, saveFeed, isArticleSaved, isFeedSaved } from "../api.js";
+    import { getFeed, saveFeed, isArticleSaved, isFeedSaved, saveArticle } from "../api.js";
     import { userEmail } from "../stores/auth.js"; 
     import {RSSParser} from "../RSSParser.js"; 
 
@@ -30,14 +30,15 @@
         }
     });
 
-    async function handleSubscribe() {
+    async function handleSubscribe(title, description) {
         if (!currentUserEmail) {
             alert("Please log in to subscribe to feeds");
             return;
         }
         try {
-            await saveFeed({
-                feed_name: feed.feed_name,
+            await saveArticle({
+                email: currentUserEmail,
+                article_name: `${title}: ${description}`,
                 url: feed.url,
             });
             isSaved = true;
@@ -64,7 +65,9 @@
         {#each Object.entries(dictionary) as [key, value]}
             <p class='feed-box'>
                 <strong>{key}</strong>: {value}
+                <button on:click={handleSubscribe(key, value)}>Save</button>
             <p>
+                
         {/each}
     </ul>
     
