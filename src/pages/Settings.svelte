@@ -74,7 +74,7 @@
         <p class="success">{successMessage}</p>
       {/if}
   
-      <div class="add-feed">
+      <!-- <div class="add-feed">
         <h3>Add New Feed</h3>
         <input
           type="text"
@@ -87,7 +87,7 @@
           bind:value={newFeedUrl}
         />
         <button on:click={handleAddFeed}>Add Feed</button>
-      </div>
+      </div> -->
   
       <div class="subscribed-feeds">
         <h3>Your Subscribed Feeds</h3>
