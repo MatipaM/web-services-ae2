@@ -36,8 +36,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y python3 gcc g++ make
 
+    - name: Update Rollup and related dependencies
+      run: |
+        npm install rollup@latest @rollup/plugin-node-resolve@latest @rollup/plugin-commonjs@latest --save-dev
+
     - name: Install dependencies
-      run: npm ci
+      run: |
+        rm -rf node_modules
+        rm package-lock.json
+        npm install
 
     - name: Run tests
       run: npm test
