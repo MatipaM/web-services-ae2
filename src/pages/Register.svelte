@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import {navigate} from 'svelte-routing';
     import { login, logout, isAuthenticated, user } from '../stores/auth.js';
+    // import bcrypt from 'bcrypt';
     
     let username = '';
     let firstname = '';
@@ -14,6 +15,19 @@
     let errorMessage = '';
   
     $: loggedIn = $isAuthenticated;
+
+
+    const saltRounds = 10; 
+
+    // function hashPassword(password){
+    //   bcrypt.genSalt(saltRounds, function(err, salt) {
+    //   bcrypt.hash(password, salt, function(err, hash) {
+    //       if (err) throw err;
+    //       // Store the 'hash' in your database
+    //       });
+    // });
+    // }
+
   
     function handleSubmit(event) {
       event.preventDefault();

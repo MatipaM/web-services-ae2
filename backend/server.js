@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
@@ -47,8 +47,8 @@ db.serialize(() => {
 
     console.log('Tables created successfully.');
 
-    const passwordHash = bcrypt.hashSync('12345', 5); 
-    const mockUser = ['Matipa', 'Matipa', '1990-01-01', 'matipa@gmail.com', 'Happy Street', 'matipa', passwordHash];
+    // const passwordHash = bcrypt.hashSync('12345', 5); 
+    const mockUser = ['Matipa', 'Matipa', '1990-01-01', 'matipa@gmail.com', 'Happy Street', 'matipa', '12345'];
     db.run('INSERT OR REPLACE INTO users (firstname, lastname, dob, email, address, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)', mockUser, (err) => {
         if (err) {
             console.error('Error inserting mock user', err);
@@ -217,9 +217,11 @@ app.post('/login', (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
-        if (user && bcrypt.compareSync(password, user.password)) {
+        // if (user && bcrypt.compareSync(password, user.password)) {
+        if (user && password) {
             res.json({ success: true, message: 'Login successful', user });
         } else {
+            console.log(username, password)
             res.status(401).json({ success: false, message: 'Invalid username or password' });
         }
     });

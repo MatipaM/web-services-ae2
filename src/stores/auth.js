@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import {navigate} from 'svelte-routing';
 
 export const isAuthenticated = writable(false);
 export const user = writable(null);
@@ -16,6 +17,7 @@ export function login(email) {
   localStorage.setItem('user', JSON.stringify(userData));
   isAuthenticated.set(true);
   user.set(userData);
+  navigate('/')
 }
 
 export function logout() {
@@ -23,4 +25,5 @@ export function logout() {
   isAuthenticated.set(false);
   user.set(null);
 }
+
 
