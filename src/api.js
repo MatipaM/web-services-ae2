@@ -60,15 +60,27 @@ export async function saveArticle({ email, article_name, url }) {
 
 export async function saveFeed(email, feed_name, url) {
   const response = await fetch(`${API_URL}/feed`, {
+<<<<<<< HEAD
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, feed_name, url }),
+=======
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, feed_name, url })
+>>>>>>> 51a4776 (feed)
   });
 
   if (!response.ok) {
+<<<<<<< HEAD
       throw new Error('Failed to save feed');
+=======
+    throw new Error('Failed to save feed');
+>>>>>>> 51a4776 (feed)
   }
   return response.json();
 }
