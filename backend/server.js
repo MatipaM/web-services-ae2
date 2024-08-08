@@ -3,6 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 
 const app = express();
@@ -46,6 +47,7 @@ db.serialize(() => {
         PRIMARY KEY (url)
     )`);
 
+<<<<<<< HEAD
     db.run(`CREATE TABLE IF NOT EXISTS subscribedFeeds (
         feed_name TEXT NOT NULL,
         url TEXT NOT NULL UNIQUE,
@@ -53,6 +55,15 @@ db.serialize(() => {
         FOREIGN KEY (email) REFERENCES users(email),
         PRIMARY KEY (url)
     )`);
+=======
+    db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+        id TEXT PRIMARY KEY,
+        email TEXT NOT NULL,
+        feed_name TEXT NOT NULL,
+        url TEXT NOT NULL,
+        FOREIGN KEY (email) REFERENCES users(email)
+      )`);
+>>>>>>> 51a4776 (feed)
 
     console.log('Tables created successfully.');
 
@@ -106,6 +117,22 @@ db.serialize(() => {
 });
 
 // API endpoints
+app.post('/feed', (req, res) => {
+    const { email, feed_name, url } = req.body;
+    const id = uuidv4(); 
+  
+    db.run('INSERT INTO subscriptions (id, email, feed_name, url) VALUES (?, ?, ?, ?)',
+      [id, email, feed_name, url],
+      function(err) {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ success: false, message: 'Error saving feed subscription' });
+        }
+        res.json({ success: true, message: 'Feed subscribed successfully', id: id });
+      }
+    );
+  });
+
 app.get('/feeds-with-articles', (req, res) => {
     db.all('SELECT * FROM feeds', (err, feeds) => {
         if (err) {
@@ -249,21 +276,27 @@ app.post('/article', (req, res) => {
     );
 });
 
-
-
 app.post('/feed', (req, res) => {
     const { email, feed_name, url } = req.body;
+
+    if (!email || !feed_name || !url) {
+        return res.status(400).json({ error: 'Missing required fields: email, feed_name, or url' });
+    }
+
     db.run('INSERT INTO subscribedFeeds (email, feed_name, url) VALUES (?, ?, ?)',
         [email, feed_name, url],
         function (err) {
             if (err) {
-                res.status(500).json({ error: err.message });
+                console.error('Error inserting into subscribedFeeds:', err.message);
+                res.status(500).json({ error: 'Failed to save feed', details: err.message });
                 return;
             }
             res.json({ id: this.lastID });
         }
     );
 });
+
+
 
 app.delete('/article', (req, res) => {
     const { email, url } = req.body;

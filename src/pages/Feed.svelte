@@ -1,8 +1,12 @@
 <script>
     import { onMount } from "svelte";
+<<<<<<< HEAD
     import { getFeed, saveFeed, isArticleSaved, isFeedSaved, saveArticle } from "../api.js";
+=======
+    import { getFeed, saveFeed, unsaveFeed, isFeedSaved } from "../api.js";
+>>>>>>> 51a4776 (feed)
     import { userEmail } from "../stores/auth.js"; 
-    import {RSSParser} from "../RSSParser.js"; 
+    //import {RSSParser} from "../RSSParser.js"; 
 
     export let url = "";
 
@@ -14,17 +18,38 @@
 
     $: currentUserEmail = $userEmail;
 
+    async function checkSavedStatus() {
+        if (currentUserEmail && feed) {
+            try {
+                const result = await isFeedSaved(currentUserEmail, feed.url);
+                isSaved = result.isSaved;
+            } catch (e) {
+                console.error("Error checking feed saved status:", e);
+            }
+        }
+    }
+
     onMount(async () => {
+<<<<<<< HEAD
          console.log("is running")
         try {
             feed = await getFeed(decodeURIComponent(url));
 
-            const parser = new RSSParser(feed.name);
-            dictionary = await parser.displayArticle();
+            // const parser = new RSSParser(feed.name);
+            // dictionary = await parser.displayArticle();
             // parser.displayFeed();
 
         } catch (e) {
             console.log(e)
+=======
+        try {
+            feed = await getFeed(decodeURIComponent(url));
+            console.log("feed", feed);
+            await checkSavedStatus();
+        } catch (e) {
+            console.error(e);
+            error = e.message;
+>>>>>>> 51a4776 (feed)
         } finally {
             loading = false;
         }
@@ -36,6 +61,7 @@
             return;
         }
         try {
+<<<<<<< HEAD
             await saveArticle({
                 email: currentUserEmail,
                 article_name: `${title}: ${description}`,
@@ -45,6 +71,19 @@
             alert("Article saved successfully!");
         } catch (e) {
             alert("Error saving article: " + e.message +title+description);
+=======
+            if (isSaved) {
+                await unsaveFeed(currentUserEmail, feed.url);
+                isSaved = false;
+                alert("Unsubscribed from feed successfully!");
+            } else {
+                await saveFeed(currentUserEmail, feed.feed_name, feed.url);
+                isSaved = true;
+                alert("Subscribed to feed successfully!");
+            }
+        } catch (e) {
+            alert("Error " + (isSaved ? "unsubscribing from" : "subscribing to") + " feed: " + e.message);
+>>>>>>> 51a4776 (feed)
         }
     }
 </script>
@@ -56,11 +95,10 @@
 {:else if dictionary!={}}
     <h1>{feed.feed_name}</h1>
     <p>
-        URL: <a href={feed.url} target="_blank" rel="noopener noreferrer"
-            >{feed.url}</a
-        >
+        URL: <a href={feed.url} target="_blank" rel="noopener noreferrer">{feed.url}</a>
     </p>
 
+<<<<<<< HEAD
     <ul>
         {#each Object.entries(dictionary) as [key, value]}
             <p class='feed-box'>
@@ -80,3 +118,12 @@
     <p>No feed found</p>
 {/if}
 
+=======
+    <button on:click={handleSubscribe}>
+        {isSaved ? "Unsubscribe from feed" : "Subscribe to feed"}
+    </button>
+
+{:else}
+    <p>No feed found</p>
+{/if}
+>>>>>>> 51a4776 (feed)
