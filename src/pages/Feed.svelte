@@ -62,9 +62,9 @@
 
     <ul>
         {#each Object.entries(dictionary) as [key, value]}
-            <li>
+            <p class='feed-box'>
                 <strong>{key}</strong>: {value}
-            </li>
+            <p>
         {/each}
     </ul>
     
