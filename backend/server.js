@@ -47,15 +47,6 @@ db.serialize(() => {
         PRIMARY KEY (url)
     )`);
 
-<<<<<<< HEAD
-    db.run(`CREATE TABLE IF NOT EXISTS subscribedFeeds (
-        feed_name TEXT NOT NULL,
-        url TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL,
-        FOREIGN KEY (email) REFERENCES users(email),
-        PRIMARY KEY (url)
-    )`);
-=======
     db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
         id TEXT PRIMARY KEY,
         email TEXT NOT NULL,
@@ -63,7 +54,6 @@ db.serialize(() => {
         url TEXT NOT NULL,
         FOREIGN KEY (email) REFERENCES users(email)
       )`);
->>>>>>> 51a4776 (feed)
 
     console.log('Tables created successfully.');
 
